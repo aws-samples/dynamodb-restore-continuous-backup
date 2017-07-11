@@ -1,0 +1,100 @@
+{
+  "objects": [
+    {
+      "output": {
+        "ref": "DDBDestinationTable"
+      },
+      "input": {
+        "ref": "S3InputDataNode"
+      },
+      "stage": "false",
+      "name": "TableRestoreActivity",
+      "hiveScript": "ADD JAR s3://elasticmapreduce/samples/hive-ads/libs/jsonserde.jar;\n\nDROP TABLE IF EXISTS s3TempTable;\n\nCREATE EXTERNAL TABLE s3TempTable(\n    #{myDDBColDefn})\nROW FORMAT SERDE 'com.amazon.elasticmapreduce.JsonSerde'\nWITH SERDEPROPERTIES ('paths'='#{myNewimageFieldMapping}')\nLOCATION '#{myInputS3Loc}';\n\nDROP TABLE IF EXISTS tempHiveTable;\n\nCREATE EXTERNAL TABLE tempHiveTable (#{myDDBColDefn})\nSTORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler' \nTBLPROPERTIES (\"dynamodb.table.name\" = \"#{myDDBTableName}\", \"dynamodb.column.mapping\" = \"#{myDDBTableColMapping}\");\n                    \nINSERT OVERWRITE TABLE tempHiveTable SELECT * FROM s3TempTable;",
+      "id": "TableRestoreActivity",
+      "runsOn": {
+        "ref": "EmrClusterForRestore"
+      },
+      "myComment": "Activity used to run the hive script to import continuous backup json data",
+      "type": "HiveActivity"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "pipelineLogUri": "#{myLogUri}",
+      "scheduleType": "ONDEMAND",
+      "name": "Default",
+      "id": "Default"
+    },
+    {
+      "name": "EmrClusterForRestore",
+      "coreInstanceType": "m1.medium",
+      "coreInstanceCount": "1",
+      "releaseLabel": "emr-5.6.0",
+      "masterInstanceType": "m1.medium",
+      "id": "EmrClusterForRestore",
+      "type": "EmrCluster"
+    },
+    {
+      "writeThroughputPercent": "#{myDDBWriteThroughputRatio}",
+      "name": "DDBDestinationTable",
+      "id": "DDBDestinationTable",
+      "type": "DynamoDBDataNode",
+      "tableName": "#{myDDBTableName}"
+    },
+    {
+      "directoryPath": "#{myInputS3Loc}",
+      "name": "S3InputDataNode",
+      "id": "S3InputDataNode",
+      "type": "S3DataNode"
+    }
+  ],
+  "parameters": [
+    {
+      "description": "newimage Field Mapping",
+      "id": "myNewimageFieldMapping",
+      "type": "String"
+    },
+    {
+      "description": "Input S3 folder",
+      "id": "myInputS3Loc",
+      "type": "AWS::S3::ObjectKey"
+    },
+    {
+      "description": "S3 to DynamoDB Column Mapping",
+      "id": "myDDBTableColMapping",
+      "type": "String"
+    },
+    {
+      "description": "DynamoDB Column Mappings",
+      "id": "myDDBColDefn",
+      "type": "String"
+    },
+    {
+      "description": "DataPipeline Log Uri",
+      "id": "myLogUri",
+      "type": "AWS::S3::ObjectKey"
+    },
+    {
+      "description": "DynamoDB table name",
+      "id": "myDDBTableName",
+      "type": "String"
+    },
+    {
+      "default": "0.25",
+      "watermark": "Enter value between 0.1-1.0",
+      "description": "DynamoDB write throughput ratio",
+      "id": "myDDBWriteThroughputRatio",
+      "type": "Double"
+    }
+  ],
+  "values": {
+    "myDDBColDefn": "VendorID string,TestProjectID string,CreateDate string,DefaultStage string,ModifiedDate string,Name string,TenantID string,DefaultTenantTestObjectID string,ProductDisplayName string",
+    "myDDBTableColMapping": "VendorID:VendorID,TestProjectID:TestProjectID,CreateDate:CreateDate,DefaultStage:DefaultStage,ModifiedDate:ModifiedDate,Name:Name,TenantID:TenantID,DefaultTenantTestObjectID:DefaultTenantTestObjectID,ProductDisplayName:ProductDisplayName",
+    "myDDBTableName": "TestProject_RestoreTo20161015_235959",
+    "myDDBWriteThroughputRatio": "1",
+    "myLogUri": "s3://",
+    "myNewimageFieldMapping": "NewImage.VendorID.S,NewImage.TestProjectID.S,NewImage.CreateDate.S,NewImage.DefaultStage.S,NewImage.ModifiedDate.S,NewImage.Name.S,NewImage.TenantID.S,NewImage.DefaultTenantTestObjectID.S,NewImage.ProductDisplayName.S",
+    "myInputS3Loc": "s3://mys3bucketwithcontinuousbackup/dynamodb/continuous-backup/TestProject/2016/10/15"
+  }
+}
