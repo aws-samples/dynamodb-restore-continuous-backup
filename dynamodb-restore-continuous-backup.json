@@ -51,39 +51,39 @@
   ],
   "parameters": [
     {
-      "description": "Newimage Field Mapping: A comma seperated json path for the DynamoDB backup objects loaded in memory. It is always formated as 'NewImage.{field_name}.{field_type}'. For e.g. NewImage.VendorID.S,NewImage.TestProjectID.S,NewImage.CreateDate.S,NewImage.DefaultStage.S,NewImage.ModifiedDate.S,NewImage.Name.S,NewImage.TenantID.S,NewImage.DefaultTenantTestObjectID.S,NewImage.ProductDisplayName.S",
+      "description": "Newimage Field Mapping",
       "id": "myNewimageFieldMapping",
       "type": "String"
     },
     {
-      "description": "Input S3 prefix: The s3 prefix from which the source data are to be imported in your targeted DynamoDB table",
+      "description": "Input S3 prefix",
       "id": "myInputS3Loc",
       "type": "AWS::S3::ObjectKey"
     },
     {
-      "description": "S3 to DynamoDB Column Mapping: A comma separated mapping of S3 to DynamoDB. For e.g. VendorID:VendorID,TestProjectID:TestProjectID,CreateDate:CreateDate,DefaultStage:DefaultStage,ModifiedDate:ModifiedDate,Name:Name,TenantID:TenantID,DefaultTenantTestObjectID:DefaultTenantTestObjectID,ProductDisplayName:ProductDisplayName. Please take care of not using spaces in between the commas.",
+      "description": "S3 to DynamoDB Column Mapping",
       "id": "myDDBTableColMapping",
       "type": "String"
     },
     {
-      "description": "Dynamodb Column Mappings: A comma seperated column definitions. For e.g. VendorID string,TestProjectID string,CreateDate string,DefaultStage string,ModifiedDate string,Name string,TenantID string,DefaultTenantTestObjectID string,ProductDisplayName string",
+      "description": "Dynamodb Column Mappings",
       "id": "myDDBColDefn",
       "type": "String"
     },
     {
-      "description": "DataPipeline Log Uri: S3 log path to capture the pipeline logs.",
+      "description": "DataPipeline Log Uri",
       "id": "myLogUri",
       "type": "AWS::S3::ObjectKey"
     },
     {
-      "description": "DynamoDB table name: The targeted Dynamo table name.",
+      "description": "DynamoDB table name",
       "id": "myDDBTableName",
       "type": "String"
     },
     {
       "default": "0.25",
       "watermark": "Enter value between 0.1-1.0",
-      "description": "DynamoDB write throughput ratio: The write throughput ratio to be used for the import operation.",
+      "description": "DynamoDB write throughput ratio",
       "id": "myDDBWriteThroughputRatio",
       "type": "Double"
     }
