@@ -27,4 +27,5 @@ Then, fill in needed paramaters, knowing that they will stand for the following 
  # License
 
  Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ 
  SPDX-License-Identifier: MIT-0
